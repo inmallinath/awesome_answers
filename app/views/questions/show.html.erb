@@ -1,0 +1,71 @@
+<h2><%= @question.title %></h2>
+
+<p><%= @question.body %></p>
+
+<p>View Count: <%= @question.view_count %></p>
+
+<p><%= @question.created_at %></p>
+
+<p>Category: <%= @question.category_name %></p>
+
+<p>
+   Creaated By: <%= @question.user_full_name%>
+</p>
+<hr />
+<%# This is the like object for the `current_user` and `@question` %>
+
+<%like = @question.like_for(current_user)%>
+<% if like %>
+<%= link_to "Un-Like", question_like_path(@question, like), method: :delete%>
+<%else%>
+<%= link_to "Like", question_likes_path(@question), method: :post%>
+<%end%>
+(<%= @question.likes.count %>)
+<hr />
+
+
+<%# if user_signed_in? && current_user == @question.user%>
+<% if can? :edit, @question%>
+<%= link_to "Edit", edit_question_path(@question) %>
+<%end%>
+<%# method: :delete asks Rails to send a DELETE request instead of GET which
+     is accomplished using Javascript/jQuery %>
+<% if can? :delete, @question%>
+<%= link_to "Delete",
+            question_path(@question),
+            method: :delete,
+            data: { confirm: "Are you sure?" } %>
+<%end%>
+<h2>Answers</h2>
+<h3>Create an Answer</h3>
+<%# We can use the form after overriding the `url` parameter. The downside to it
+is that it won't work for `edit` situation. This will only work in `create` situation.
+So we can't reuse it if we decide to implement editing answers. %>
+<%#= form_for @answer, url: question_answers_path(@question) do |f| %>
+<%#end%>
+<%# THE PREFERRED APPROACH %>
+<%# Passing an array to the `form_for` is a better approach for creating nested
+resources. This approach will work for both new/edit situations. So if @answer is not persisted
+it will send a POST request to question_answers_path(@question). And if @answer is persisted it
+will send a PATCH request to question_answer_path(@question, @answer) %>
+<%= @answer.errors.full_messages.join(", ") %>
+<%= form_for [@question, @answer] do |f| %>
+  <div>
+    <%= f.label :body %>
+    <%= f.text_area :body %>
+  </div>
+  <%= f.submit %>
+<%end %>
+
+<% @question.answers.each do |ans| %>
+<%=  ans.body%>
+<p>
+  Created by: <%= ans.user_full_name %>
+</p>
+<% if can? :delete, ans%>
+<%= link_to "delete", question_answer_path(@question, ans),
+                      method: :delete,
+                      data: {confirm: "Are you sure?"}%>
+<%end%>
+<hr />
+<%end%>

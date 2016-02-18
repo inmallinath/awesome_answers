@@ -1,0 +1,23 @@
+<h2> All Questions (<%= @questions.length %>) </h2>
+
+<table class="table table-striped">
+  <tr>
+    <th class="text-center">
+      Question Title
+    </th>
+    <th class="text-center">
+      No of Views
+    </th>
+  </tr>
+  <% @questions.each do |question| %>
+  <tr>
+      <td>
+        <%= link_to question.title, question_path(question) %>
+      </td>
+      <td>
+        <%= question.view_count%>
+      </td>
+
+  </tr>
+  <%end%>
+</table>

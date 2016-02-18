@@ -1,0 +1,32 @@
+<%# this is a partial file which can be included in other templates %>
+<%= @question.errors.full_messages.join(", ") %>
+<%# From new.html.erb %>
+<%# the form_for takes in an activeRecord object as the first argument. Then it looks at the object. If the object is not persisted (not yet saved to the database), the form will automatically use POST for its `method`. It will also automatically use `questions_path` as its action (convention is that the `questions_path` will submit to the `create` action) %>
+
+<%# From edit.html.erb %>
+<%# if @question is persisted then the form will send PATCH request by adding
+     a hidden field with name _method and value `patch`. The action URL will be
+     question_path(@question) (by convention). The form will prepopulate the fields
+     with existing values for `@question` %>
+
+<%= form_for @question do |f| %>
+<%# we call `f` the form object %>
+<div>
+  <%= f.label :title %>
+  <%= f.text_field :title %>
+</div>
+
+<div>
+  <%= f.label :body %>
+  <%= f.text_area :body%>
+</div>
+
+<div>
+  <%= f.label :category_id%>
+  <%= f.collection_select(:category_id, Category.order(:name), :id, :name) %>
+</div>
+
+<div>
+  <%= f.submit %>  <%# this label is created based on the persisted data, if data is not persisted the label is automatically set to create question else it would automatically say as `update question` %>
+</div>
+<%end%>
